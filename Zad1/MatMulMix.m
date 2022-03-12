@@ -1,4 +1,4 @@
-function [C] = MatMulStrassen(A,B)
+function [C] = MatMulMix(A,B, L)
   max_recursion_depth (5000, "local")
 
   sza = size(A);
@@ -9,12 +9,19 @@ function [C] = MatMulStrassen(A,B)
     return
   endif
   if(!IsPow2(sza(1)) || !IsPow2(sza(2)) || !IsPow2(szb(1)) || !IsPow2(szb(2)))
-    disp('Rozmiary nie s? pot?gami 2');
+    disp('Rozmiary nie sa potegami 2');
     C(1:sza(2),1:szb(1))=0;
     return
   endif
   
   n = sza(1);
+  
+  # tradycyjne mnozenie macierzy dla odpowiednio ma?ych macierzy
+  if(n <= 2^L)
+    C = MatMulSimple(A,B);
+    return;
+  endif
+    
   nhalf = n/2;
   
   # podzial macierzy na bloki
@@ -38,13 +45,13 @@ function [C] = MatMulStrassen(A,B)
     P6 = (A21-A11) * (B11+B12);
     P7 = (A12-A22) * (B21+B22);
   else
-    P1 = MatMulStrassen(A11+A22,  B11+B22);
-    P2 = MatMulStrassen(A21+A22,  B11);
-    P3 = MatMulStrassen(A11,      B12-B22);
-    P4 = MatMulStrassen(A22,      B21-B11);
-    P5 = MatMulStrassen(A11+A12,  B22);
-    P6 = MatMulStrassen(A21-A11,  B11+B12);
-    P7 = MatMulStrassen(A12-A22,  B21+B22);
+    P1 = MatMulMix(A11+A22,  B11+B22,   L);
+    P2 = MatMulMix(A21+A22,  B11,       L);
+    P3 = MatMulMix(A11,      B12-B22,   L);
+    P4 = MatMulMix(A22,      B21-B11,   L);
+    P5 = MatMulMix(A11+A12,  B22,       L);
+    P6 = MatMulMix(A21-A11,  B11+B12,   L);
+    P7 = MatMulMix(A12-A22,  B21+B22,   L);
   endif
   
   # wykorzystanie P do obliczenia blokow wynikowej macierzy
