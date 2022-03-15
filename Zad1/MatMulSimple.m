@@ -11,7 +11,7 @@ function [C,counter_operation] = MatMulSimple(A,B)
     for j=1:szb(1)
       for k=1:sza(1) %lub szb(2)
         C(i,j) = C(i,j) + A(i,k)*B(k,j);
-        counter_operation = counter_operation + 1;
+        counter_operation = counter_operation + 2;
       end
     end    
   end

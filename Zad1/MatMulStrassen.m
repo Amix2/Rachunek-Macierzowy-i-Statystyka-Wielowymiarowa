@@ -36,8 +36,7 @@ function [C, counter_operation] = MatMulStrassen(A,B)
     P5 = (A11+A12) * (B22);
     P6 = (A21-A11) * (B11+B12);
     P7 = (A12-A22) * (B21+B22);
-    counter_operation = counter_operation  + 7*8;
-    % + + 7*8  
+    counter_operation = counter_operation  + 7*8 + 10*4;
   else
     [P1, c_P1]  = MatMulStrassen(A11+A22,  B11+B22);
     [P2, c_P2] = MatMulStrassen(A21+A22,  B11);
@@ -46,8 +45,7 @@ function [C, counter_operation] = MatMulStrassen(A,B)
     [P5, c_P5] = MatMulStrassen(A11+A12,  B22);
     [P6, c_P6] = MatMulStrassen(A21-A11,  B11+B12);
     [P7, c_P7] = MatMulStrassen(A12-A22,  B21+B22);
-    counter_operation = c_P1 + c_P2 + c_P3 + c_P4 + c_P5 + c_P6 + c_P7;
-    %+ 10*(n*n);
+    counter_operation = c_P1 + c_P2 + c_P3 + c_P4 + c_P5 + c_P6 + c_P7 + 10*(n*n);
   end
   
   % wykorzystanie P do obliczenia blokow wynikowej macierzy
