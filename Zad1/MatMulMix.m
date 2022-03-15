@@ -36,7 +36,7 @@ function [C, counter_operation] = MatMulMix(A,B, L)
     counter_operation = counter_operation  + 7*8;
     % + + 7*8  
   else
-    [P1, c_P1]  = MatMulMix(A(1:nhalf,1:nhalf)+A(nhalf+1:n,nhalf+1:n),      B(1:nhalf,1:nhalf)+B(nhalf+1:n,nhalf+1:n),      L);
+    [P1, c_P1] = MatMulMix(A(1:nhalf,1:nhalf)+A(nhalf+1:n,nhalf+1:n),      B(1:nhalf,1:nhalf)+B(nhalf+1:n,nhalf+1:n),      L);
     [P2, c_P2] = MatMulMix(A(nhalf+1:n,1:nhalf)+A(nhalf+1:n,nhalf+1:n),     B(1:nhalf,1:nhalf),                             L);
     [P3, c_P3] = MatMulMix(A(1:nhalf,1:nhalf),                              B(1:nhalf,nhalf+1:n)-B(nhalf+1:n,nhalf+1:n),    L);
     [P4, c_P4] = MatMulMix(A(nhalf+1:n,nhalf+1:n),                          B(nhalf+1:n,1:nhalf)-B(1:nhalf,1:nhalf),        L);
