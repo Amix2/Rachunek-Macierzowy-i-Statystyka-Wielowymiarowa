@@ -1,7 +1,7 @@
 function time = TimeFigure()
   
   max_l = 6;
-  max_k = 10;
+  max_k = 9;
 
   hf = figure ();
   max_time = 0;
