@@ -23,8 +23,10 @@ function time = ShowFigure()
 
   hf = figure ();
   hold on;
-      
+  po = 3;
+  idealYs = (2 .^x ) .^ po .* (OPS(1) / (2^po));
   plot (x, OPS);
+  plot (x, idealYs);
   set(gca, 'YScale', 'log') 
   axis ([1,max_k, 0, max(OPS)]);
   xlabel ("k");

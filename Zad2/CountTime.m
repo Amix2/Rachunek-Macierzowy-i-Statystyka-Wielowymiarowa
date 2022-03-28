@@ -2,7 +2,6 @@ function time = CountTime()
   
   max_k = 9;
 
-  hf = figure ();
   max_time = 0;
   OPS = 1:max_k;
   times = 1:max_k;
@@ -16,9 +15,11 @@ function time = CountTime()
       tic ();
       endVal = 1;
       if n < 5
-          endVal = 10;
+          endVal = 100;
+      elseif n < 8
+          endVal = 50;
       elseif n < 10
-          endVal = 2;
+          endVal = 20;
       end
       for rep = 1:endVal
           [~, operation] = MMInverse(matrix);
@@ -32,8 +33,10 @@ function time = CountTime()
       index = index + 1; 
       
       OPS(n) = operation;
+
+      csvwrite("ops.csv", OPS)
+      csvwrite("times.csv", times)
   end
 
-  csvwrite("ops.csv", OPS)
-  csvwrite("times.csv", times)
+
 
