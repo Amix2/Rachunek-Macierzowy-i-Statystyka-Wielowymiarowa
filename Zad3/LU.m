@@ -1,11 +1,9 @@
 function [L, U, operations] = LU(inputM)
     operations = 0;
     sza = size(inputM);
-
-    
+   
     n = sza(1);
-    
-    disp(n)
+
     if(n == 1)
       if(inputM == 0)
           disp("ERROR C == 0");

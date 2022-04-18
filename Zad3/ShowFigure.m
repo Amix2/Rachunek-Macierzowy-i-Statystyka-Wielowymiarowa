@@ -6,9 +6,6 @@ function time = ShowFigure()
   max_time = max(times);
   max_k = length(times)
 
-  disp(times)
-  disp(max_k)
-
   x = 1:1:max_k;
 
   hf = figure ();
@@ -17,8 +14,8 @@ function time = ShowFigure()
   set(gca, 'YScale', 'log') 
   axis ([1,max_k, 0, max_time]);
   xlabel ("k");
-  ylabel ("times(s)");
-  title ("Czas odwracania macierzy");
+  ylabel ("Czas (s)");
+  title ("Czas wyznaczania LU macierzy");
 
 
   hf = figure ();
@@ -31,6 +28,7 @@ function time = ShowFigure()
   axis ([1,max_k, 0, max(OPS)]);
   xlabel ("k");
   ylabel ("Operacje");
+  legend("LU faktoryzacja", "O(n³)")
 
   title ("Liczba operacji zmiennoprzecinkowych");
 
