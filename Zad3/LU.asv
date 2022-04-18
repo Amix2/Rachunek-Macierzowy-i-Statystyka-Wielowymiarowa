@@ -1,0 +1,46 @@
+function [L, U, operations] = LU(inputM)
+    operations = 0;
+    sza = size(inputM);
+    
+    n = sza(1);
+    if(n == 1)
+      if(inputM == 0)
+          disp("ERROR C == 0");
+      end
+      C = 1/inputM;
+      operations = 1;
+      return;
+    end
+    nhalf = n/2;
+    L = 5;
+    % podzial macierzy na bloki
+    A11 = inputM(1:nhalf,1:nhalf);
+    A12 = inputM(1:nhalf,nhalf+1:n);
+    A21 = inputM(nhalf+1:n,1:nhalf);
+    A22 = inputM(nhalf+1:n,nhalf+1:n);
+    
+
+    % rekurencyjnie [L11, U11] = LU(A11)
+    [L11, U11, LU_A11_Ops] = LU(A11);
+
+    % Oblicz rekurencyjnie U11^-1
+    [iU11, iU11_Ops] = MMInverse(U11); 
+
+    % L21 = A21 * U11^-1 
+
+    [L21, L21_Ops] =  MatMulMix(A21, iU11, L);
+
+    % Oblicz rekurencyjnie L11^-1
+    [iL11, iL11_Ops] = MMInverse(L11);
+
+
+
+    
+    C(1:nhalf,1:nhalf)      = B11;
+    C(1:nhalf,nhalf+1:n)    = B12;
+    C(nhalf+1:n,1:nhalf)    = B21;
+    C(nhalf+1:n,nhalf+1:n)  = B22;
+    operations = operations + iA11_Ops + A21iA11_Ops + A21iA11A12_Ops + S22_Ops + iS22_Ops + iA11A12_Ops + iA11A12iS22_Ops + iA11A12iS22A21_Ops + iA11A12iS22A21iA11_Ops + ...
+        B11_Ops + B12_Ops + iS22A21_Ops + iS22A21iA11_Ops + B21_Ops;
+end
+
