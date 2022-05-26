@@ -4,6 +4,8 @@ date: "2022"
 output: html_document
 autor: "Maciej Mucha, Łukasz Wroński"
 ---
+Autorzy: Maciej Mucha, Łukasz Wroński
+
 
 Import danych. Źródło: <https://www.kaggle.com/datasets/paradisejoy/top-hits-spotify-from-20002019>
 
