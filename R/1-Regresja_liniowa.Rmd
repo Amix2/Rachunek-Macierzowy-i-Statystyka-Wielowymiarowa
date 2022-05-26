@@ -22,7 +22,7 @@ Istotny wpływ na odpowiedż mają następujące predyktory, osiągające p-wart
 
 | Predyktor        | p-wartość | współczynnik | wpływ           |
 |------------------|-----------|--------------|-----------------|
-| instrumentalness | 1.01e-06  | 1.621e-01    | dodatni, duży   |
+| instrumentalness | 3.97e-10  | 1.621e-01    | dodatni, duży   |
 | liveness         | 0.000905  | 5.398e-02    | dodatni, średni |
 | tempo            | 8.02e-05  | 3.385e-04    | dodatni, mały   |
 | valence          | \< 2e-16  | 1.694e-01    | dodatni, duży   |
