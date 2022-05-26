@@ -1,0 +1,36 @@
+---
+title: "Regresja liniowa"
+date: "2022"
+output: html_document
+autor: "Maciej Mucha, Łukasz Wroński"
+---
+
+Import danych. Źródło: <https://www.kaggle.com/datasets/paradisejoy/top-hits-spotify-from-20002019>
+
+```{r import}
+Data = read.csv("data.csv")
+```
+
+Wpływ zmiennych na energetyczność, któRa przyjmuje wartości z przedziału [0,1]
+
+```{r}
+fit <- lm(energy~instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, data = Data)
+summary(fit)
+```
+
+Istotny wpływ na odpowiedż mają następujące predyktory, osiągające p-wartość mniejszą niż 5%:
+
+| Predyktor        | p-wartość | współczynnik | wpływ           |
+|------------------|-----------|--------------|-----------------|
+| instrumentalness | 1.01e-06  | 1.621e-01    | dodatni, duży   |
+| liveness         | 0.000905  | 5.398e-02    | dodatni, średni |
+| tempo            | 8.02e-05  | 3.385e-04    | dodatni, mały   |
+| valence          | \< 2e-16  | 1.694e-01    | dodatni, duży   |
+| danceability     | \< 2e-16  | -2.036e-01   | ujemny, mały    |
+| year             | 0.000175  | -1.595e-03   | ujemny, mały    |
+| loudness         | \< 2e-16  | 4.006e-02    | dodatni, średni |
+| acousticness     | \< 2e-16  | -2.239e-01   | ujemny, duży    |
+
+Pozostałe paramtery osiągnęły p-value ponad 5%. Nie jest pewne czy ich związek nie jest przypadkowy.
+
+Wartość metryki Adjusted R-squared wynosi 0.5729, co oznacza że około 57% zaobserwowanych wariancji może zostać wyjaśniona przez dane wejściowe.
