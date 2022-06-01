@@ -370,318 +370,234 @@ pre code {
 
 <p>Autorzy: Maciej Mucha, Łukasz Wroński</p>
 <p>Import danych. Źródło: <a href="https://www.kaggle.com/datasets/paradisejoy/top-hits-spotify-from-20002019" class="uri">https://www.kaggle.com/datasets/paradisejoy/top-hits-spotify-from-20002019</a></p>
-<pre class="r"><code>Data = read.csv(&quot;data.csv&quot;)</code></pre>
+<pre class="r"><code>Data = read.csv(&quot;data.csv&quot;)
+Data$explicit &lt;- as.integer(Data$explicit == &quot;True&quot;)</code></pre>
 <p>Wpływ zmiennych na <code>mode</code>, który przyjmuje wartości z
 przedziału [0,1]. Zmianna ta wskazuje modalność (durową lub molową)
 utworu, rodzaj skali, z której pochodzi jego zawartość melodyczna.</p>
-<pre class="r"><code>fit &lt;- glm(mode~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data)
+<pre class="r"><code>fit &lt;- glm(explicit~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data)
 summary(fit)</code></pre>
 <pre><code>## 
 ## Call:
-## glm(formula = mode ~ energy + instrumentalness + liveness + tempo + 
-##     valence + danceability + duration_ms + year + popularity + 
+## glm(formula = explicit ~ energy + instrumentalness + liveness + 
+##     tempo + valence + danceability + duration_ms + year + popularity + 
 ##     loudness + speechiness + acousticness, family = binomial, 
 ##     data = Data)
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -1.6640  -1.2386   0.9458   1.0945   1.4858  
+## -2.4635  -0.6738  -0.4472   0.5003   3.1799  
 ## 
 ## Coefficients:
-##                    Estimate Std. Error z value Pr(&gt;|z|)  
-## (Intercept)       2.649e+01  1.753e+01   1.511   0.1307  
-## energy           -6.588e-01  4.561e-01  -1.444   0.1486  
-## instrumentalness -9.459e-01  5.375e-01  -1.760   0.0784 .
-## liveness          3.469e-01  3.321e-01   1.044   0.2963  
-## tempo             3.748e-03  1.761e-03   2.128   0.0333 *
-## valence          -5.064e-01  2.580e-01  -1.963   0.0496 *
-## danceability     -5.864e-01  3.879e-01  -1.512   0.1306  
-## duration_ms      -1.357e-06  1.254e-06  -1.082   0.2794  
-## year             -1.252e-02  8.652e-03  -1.448   0.1477  
-## popularity       -2.288e-03  2.143e-03  -1.067   0.2858  
-## loudness         -1.123e-03  3.180e-02  -0.035   0.9718  
-## speechiness       4.849e-02  4.851e-01   0.100   0.9204  
-## acousticness     -1.904e-01  2.983e-01  -0.638   0.5234  
+##                    Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)      -8.980e+01  2.326e+01  -3.861 0.000113 ***
+## energy           -2.096e+00  5.998e-01  -3.494 0.000475 ***
+## instrumentalness -5.583e+00  1.884e+00  -2.964 0.003038 ** 
+## liveness          3.704e-01  4.207e-01   0.880 0.378606    
+## tempo             4.273e-03  2.281e-03   1.873 0.061031 .  
+## valence          -1.544e+00  3.334e-01  -4.631 3.63e-06 ***
+## danceability      5.289e+00  5.341e-01   9.903  &lt; 2e-16 ***
+## duration_ms       8.687e-06  1.616e-06   5.376 7.61e-08 ***
+## year              4.183e-02  1.147e-02   3.648 0.000264 ***
+## popularity        3.373e-03  2.813e-03   1.199 0.230508    
+## loudness          3.751e-02  4.147e-02   0.905 0.365716    
+## speechiness       9.549e+00  6.373e-01  14.982  &lt; 2e-16 ***
+## acousticness     -1.288e+00  4.080e-01  -3.158 0.001588 ** 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2749.6  on 1999  degrees of freedom
-## Residual deviance: 2721.1  on 1987  degrees of freedom
-## AIC: 2747.1
+##     Null deviance: 2354.6  on 1999  degrees of freedom
+## Residual deviance: 1789.5  on 1987  degrees of freedom
+## AIC: 1815.5
 ## 
-## Number of Fisher Scoring iterations: 4</code></pre>
+## Number of Fisher Scoring iterations: 6</code></pre>
 <p>Istotny wpływ na odpowiedż mają następujące predyktory, osiągające
-p-wartość mniejszą niż ???%:</p>
+p-wartość mniejszą niż 5%:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Predyktor</th>
+<th>p-wartość</th>
+<th>współczynnik</th>
+<th>wpływ</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>energy</td>
+<td>0.000475</td>
+<td>-2.096e+00</td>
+<td>ujemny, duży</td>
+</tr>
+<tr class="even">
+<td>instrumentalness</td>
+<td>0.003038</td>
+<td>-5.583e+00</td>
+<td>ujemny, duży</td>
+</tr>
+<tr class="odd">
+<td>valence</td>
+<td>3.63e-06</td>
+<td>-1.544e+00</td>
+<td>ujemny, duży</td>
+</tr>
+<tr class="even">
+<td>danceability</td>
+<td>&lt; 2e-16</td>
+<td>5.289e+00</td>
+<td>dodatni, duży</td>
+</tr>
+<tr class="odd">
+<td>duration_ms</td>
+<td>7.61e-08</td>
+<td>8.687e-06</td>
+<td>dodatni, mały</td>
+</tr>
+<tr class="even">
+<td>year</td>
+<td>0.000264</td>
+<td>4.183e-02</td>
+<td>dodatni, średni</td>
+</tr>
+<tr class="odd">
+<td>speechiness</td>
+<td>&lt; 2e-16</td>
+<td>9.549e+00</td>
+<td>dodatni, duży</td>
+</tr>
+<tr class="even">
+<td>acousticness</td>
+<td>0.001588</td>
+<td>-1.288e+00</td>
+<td>ujemny, duży</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>probs = predict(fit, type = &quot;response&quot;)
 head(probs)</code></pre>
-<pre><code>##         1         2         3         4         5         6 
-## 0.4923868 0.6532019 0.6828008 0.5824915 0.5701386 0.5155303</code></pre>
-<pre class="r"><code>predicted &lt;- ifelse(probs &gt; 0.5, &quot;Major&quot;, &quot;Minor&quot;)</code></pre>
-<pre class="r"><code>cm &lt;- table(predicted, Data$energy)
+<pre><code>##          1          2          3          4          5          6 
+## 0.05560835 0.01855019 0.11365290 0.05414888 0.03900677 0.09852470</code></pre>
+<pre class="r"><code>predicted &lt;- ifelse(probs &gt; 0.5, &quot;1_pred&quot;, &quot;0_pred&quot;)</code></pre>
+<pre class="r"><code>cm &lt;- table(predicted, Data$explicit)
 cm</code></pre>
 <pre><code>##          
-## predicted 0.0549 0.0581 0.115 0.203 0.219 0.247 0.249 0.261 0.264 0.265 0.275
-##     Major      1      1     1     1     1     1     1     1     1     1     1
-##     Minor      0      0     0     0     0     0     0     0     0     0     0
-##          
-## predicted 0.28 0.284 0.291 0.292 0.296 0.302 0.308 0.31 0.314 0.316 0.317 0.318
-##     Major    1     1     1     1     2     1     1    1     2     1     1     1
-##     Minor    0     0     0     0     0     0     0    0     0     0     0     0
-##          
-## predicted 0.321 0.322 0.329 0.331 0.339 0.34 0.341 0.346 0.347 0.348 0.356
-##     Major     1     1     1     1     1    1     1     2     1     1     2
-##     Minor     0     0     0     0     0    0     0     0     0     0     0
-##          
-## predicted 0.358 0.364 0.365 0.366 0.368 0.372 0.378 0.381 0.382 0.385 0.387
-##     Major     1     1     1     1     2     1     1     2     1     2     2
-##     Minor     0     0     0     0     0     0     0     0     0     0     0
-##          
-## predicted 0.389 0.391 0.394 0.396 0.398 0.4 0.403 0.404 0.405 0.406 0.407 0.408
-##     Major     1     2     1     2     1   1     1     2     1     1     1     1
-##     Minor     0     0     0     0     0   0     0     0     0     0     0     0
-##          
-## predicted 0.41 0.412 0.414 0.416 0.417 0.42 0.422 0.425 0.426 0.427 0.428 0.43
-##     Major    1     2     1     1     0    1     2     2     1     2     4    2
-##     Minor    0     0     0     0     1    0     0     0     0     0     0    0
-##          
-## predicted 0.431 0.433 0.434 0.435 0.437 0.438 0.439 0.44 0.442 0.443 0.444
-##     Major     1     2     1     0     1     2     2    1     1     3     1
-##     Minor     0     0     0     1     0     0     0    0     0     0     0
-##          
-## predicted 0.445 0.448 0.449 0.45 0.451 0.452 0.454 0.458 0.459 0.462 0.463
-##     Major     4     1     1    1     1     1     2     1     1     2     2
-##     Minor     1     0     0    0     0     0     0     0     0     0     0
-##          
-## predicted 0.465 0.466 0.467 0.468 0.469 0.47 0.471 0.473 0.475 0.476 0.479 0.48
-##     Major     2     2     1     1     3    2     2     1     1     3     1    2
-##     Minor     0     0     1     0     0    0     0     0     0     0     0    0
-##          
-## predicted 0.481 0.482 0.484 0.485 0.486 0.487 0.488 0.489 0.491 0.492 0.493
-##     Major     3     2     1     3     3     2     2     3     1     2     1
-##     Minor     0     0     0     0     0     0     0     0     0     0     0
-##          
-## predicted 0.496 0.497 0.498 0.5 0.501 0.502 0.504 0.505 0.507 0.508 0.51 0.511
-##     Major     7     2     5   0     1     3     2     1     1     2    2     3
-##     Minor     1     0     1   1     0     0     0     0     0     0    0     0
-##          
-## predicted 0.512 0.513 0.514 0.515 0.516 0.517 0.518 0.519 0.52 0.521 0.522
-##     Major     0     2     1     5     2     6     3     3    5     2     1
-##     Minor     1     0     0     0     0     0     0     0    0     0     1
-##          
-## predicted 0.523 0.524 0.525 0.526 0.527 0.529 0.53 0.531 0.532 0.533 0.534
-##     Major     3     1     2     2     2     3    1     1     3     2     2
-##     Minor     0     3     0     0     0     1    0     0     0     0     0
-##          
-## predicted 0.536 0.537 0.538 0.539 0.54 0.541 0.543 0.544 0.546 0.548 0.549 0.55
-##     Major     2     2     7     3    2     3     2     1     1     2     3    4
-##     Minor     0     0     1     0    0     0     0     0     0     0     0    0
-##          
-## predicted 0.551 0.552 0.553 0.554 0.557 0.558 0.559 0.56 0.561 0.562 0.563
-##     Major     1     4     1     3     2     6     3    1     1     1     2
-##     Minor     1     0     0     0     1     0     0    0     1     0     2
-##          
-## predicted 0.564 0.566 0.567 0.568 0.57 0.571 0.572 0.574 0.575 0.576 0.577
-##     Major     2     3     1     4    2     3     1     4     2     2     2
-##     Minor     0     0     1     0    0     0     0     0     0     0     0
-##          
-## predicted 0.578 0.579 0.58 0.581 0.582 0.583 0.584 0.585 0.586 0.587 0.588
-##     Major     6     2    3     3     2     3     4     5     4     5     1
-##     Minor     0     0    0     1     0     2     0     1     0     0     1
-##          
-## predicted 0.589 0.59 0.591 0.593 0.594 0.595 0.596 0.597 0.598 0.599 0.6 0.601
-##     Major     6    5     1     6     4     4     2     3     4     4   5     3
-##     Minor     0    0     0     0     0     0     0     1     0     0   0     0
-##          
-## predicted 0.602 0.603 0.604 0.605 0.606 0.607 0.608 0.609 0.61 0.611 0.612
-##     Major     3     1     3     2     3     5     3     3    3     2     4
-##     Minor     0     1     0     0     0     0     0     1    0     0     0
-##          
-## predicted 0.613 0.614 0.615 0.617 0.618 0.619 0.62 0.621 0.622 0.623 0.624
-##     Major     3     3     3     1     3     1    5     3     4     1     4
-##     Minor     0     1     0     0     0     0    0     1     1     0     0
-##          
-## predicted 0.625 0.626 0.627 0.628 0.629 0.63 0.631 0.632 0.633 0.634 0.635
-##     Major     5     2     3     9     3    1     2     2     4     4     3
-##     Minor     1     0     0     0     0    0     0     1     2     0     0
-##          
-## predicted 0.636 0.637 0.638 0.639 0.64 0.641 0.642 0.643 0.644 0.645 0.646
-##     Major     5     3     4     4    1     5     2     2     3     2     1
-##     Minor     0     0     0     1    0     0     0     0     0     0     0
-##          
-## predicted 0.647 0.648 0.649 0.65 0.652 0.653 0.654 0.655 0.656 0.657 0.658
-##     Major     3     2     3    2     4     4     1     4     4     1     8
-##     Minor     0     0     1    0     1     1     1     0     0     1     1
-##          
-## predicted 0.659 0.66 0.661 0.662 0.663 0.664 0.665 0.666 0.667 0.668 0.669 0.67
-##     Major     2    1     4     5     3     7     5     5     3     5     5    4
-##     Minor     1    0     1     1     0     0     0     1     0     0     0    1
-##          
-## predicted 0.671 0.672 0.673 0.674 0.675 0.676 0.677 0.678 0.679 0.68 0.681
-##     Major     6     7     3     5     3     4     9     4     3    4     3
-##     Minor     0     0     1     0     2     0     0     2     0    1     2
-##          
-## predicted 0.682 0.683 0.684 0.685 0.686 0.687 0.688 0.689 0.69 0.691 0.692
-##     Major     6     3     2     5     1     3     4     2    4     2     5
-##     Minor     0     0     0     0     0     1     0     0    1     0     1
-##          
-## predicted 0.693 0.694 0.695 0.696 0.697 0.698 0.699 0.7 0.701 0.702 0.703 0.704
-##     Major     2     3     9     1     4     7     5   6     3     7     3     1
-##     Minor     1     0     0     0     0     0     0   0     2     2     2     0
-##          
-## predicted 0.705 0.706 0.707 0.708 0.709 0.71 0.711 0.712 0.713 0.714 0.715
-##     Major     8     3     3     1     6    6     3     3     6     6     2
-##     Minor     1     1     3     0     1    1     1     2     2     2     0
-##          
-## predicted 0.716 0.717 0.718 0.719 0.72 0.721 0.722 0.723 0.724 0.725 0.726
-##     Major     8     5     3     2    7     2     2     4     5     6     3
-##     Minor     0     1     0     1    2     1     0     1     1     0     0
-##          
-## predicted 0.727 0.728 0.729 0.73 0.731 0.732 0.733 0.734 0.735 0.736 0.737
-##     Major     2     4     7    3     5     7     4     6     5     7     1
-##     Minor     0     0     0    0     1     0     1     1     0     0     0
-##          
-## predicted 0.738 0.739 0.74 0.741 0.742 0.743 0.744 0.745 0.746 0.747 0.748
-##     Major     3     7    4     6     5     4     7     3     6     3     3
-##     Minor     0     0    1     1     0     1     0     3     1     1     2
-##          
-## predicted 0.749 0.75 0.751 0.752 0.753 0.754 0.756 0.757 0.758 0.759 0.76 0.761
-##     Major     6    3     4     4     2     5     1     4     2     5    4     5
-##     Minor     2    1     1     1     1     1     0     1     2     0    0     3
-##          
-## predicted 0.762 0.763 0.764 0.765 0.766 0.767 0.768 0.769 0.77 0.771 0.772
-##     Major     2     0     5     1     6     2     9     2    7     5     3
-##     Minor     1     1     0     2     1     0     2     3    0     0     1
-##          
-## predicted 0.773 0.774 0.775 0.776 0.777 0.778 0.779 0.78 0.781 0.782 0.783
-##     Major     1     4     3     2     5     1     1    3     3     3    11
-##     Minor     1     0     0     0     0     1     0    0     0     0     4
-##          
-## predicted 0.784 0.785 0.786 0.787 0.788 0.789 0.79 0.791 0.792 0.793 0.794
-##     Major     2     6     7     6     1     2    2     4     4     4     4
-##     Minor     0     1     2     2     0     2    2     6     2     1     0
-##          
-## predicted 0.795 0.796 0.797 0.798 0.799 0.8 0.801 0.802 0.803 0.804 0.805 0.806
-##     Major     7     3     4     3     5   7     2     3     6     4     4     1
-##     Minor     1     2     1     0     0   3     4     0     3     2     1     4
-##          
-## predicted 0.807 0.808 0.809 0.81 0.811 0.812 0.813 0.814 0.815 0.816 0.817
-##     Major     2     4     1    5     1     1     2     2     6     2     2
-##     Minor     2     5     0    1     3     1     3     2     0     0     1
-##          
-## predicted 0.818 0.819 0.82 0.821 0.822 0.823 0.824 0.825 0.826 0.827 0.828
-##     Major     1     4    5     3     4     7     4     4     2     1     3
-##     Minor     0     2    1     1     2     1     2     1     2     0     0
-##          
-## predicted 0.829 0.83 0.831 0.832 0.833 0.834 0.835 0.836 0.837 0.838 0.839 0.84
-##     Major     6    5     4     3     1     6     4     7     5     2     1    2
-##     Minor     0    1     0     2     0     2     1     2     2     1     2    3
-##          
-## predicted 0.841 0.842 0.843 0.844 0.845 0.846 0.847 0.848 0.849 0.85 0.851
-##     Major     4     1     4     7     4     3     6     5     5    2     3
-##     Minor     1     0     1     1     0     0     0     0     1    0     1
-##          
-## predicted 0.852 0.853 0.854 0.855 0.856 0.857 0.858 0.859 0.86 0.861 0.862
-##     Major     1     2     2     3     1     7     8     1    3     8     8
-##     Minor     1     3     1     0     0     1     0     3    1     1     4
-##          
-## predicted 0.863 0.864 0.865 0.866 0.867 0.868 0.869 0.87 0.871 0.872 0.873
-##     Major     3     3     3     3     5     4     7    4     1     4     4
-##     Minor     3     0     1     0     0     1     0    0     0     3     1
-##          
-## predicted 0.874 0.875 0.876 0.877 0.878 0.879 0.88 0.881 0.882 0.883 0.884
-##     Major     6     2     7     6     1     0    3     1     3     2     2
-##     Minor     2     0     1     0     1     1    2     4     4     0     1
-##          
-## predicted 0.885 0.886 0.887 0.888 0.889 0.89 0.891 0.892 0.893 0.894 0.895
-##     Major     3     4     5     1     4    3     4     0     2     7     2
-##     Minor     2     1     3     1     1    0     2     1     1     0     1
-##          
-## predicted 0.896 0.897 0.898 0.899 0.9 0.901 0.902 0.903 0.904 0.905 0.906 0.907
-##     Major     4     2     1     1   4     2     2     2     2     8     4     2
-##     Minor     0     0     0     2   1     2     0     1     2     0     1     1
-##          
-## predicted 0.908 0.909 0.91 0.911 0.912 0.913 0.914 0.915 0.916 0.917 0.918
-##     Major     1     2    3     5     2     3     1     4     1     2     0
-##     Minor     1     1    0     1     0     2     0     0     3     0     2
-##          
-## predicted 0.919 0.92 0.921 0.922 0.923 0.924 0.925 0.926 0.927 0.928 0.929 0.93
-##     Major     1    1     6     2     2     1     0     2     0     2     4    3
-##     Minor     1    0     3     7     3     4     2     0     3     0     0    1
-##          
-## predicted 0.931 0.932 0.933 0.934 0.935 0.936 0.937 0.938 0.939 0.94 0.941
-##     Major     6     3     2     3     1     4     1     1     4    2     0
-##     Minor     1     0     1     1     1     0     2     1     3    0     1
-##          
-## predicted 0.942 0.943 0.944 0.945 0.946 0.947 0.948 0.95 0.951 0.952 0.953
-##     Major     1     1     1     0     2     0     5    3     1     1     3
-##     Minor     2     1     0     1     1     1     0    0     0     0     0
-##          
-## predicted 0.954 0.955 0.956 0.957 0.958 0.959 0.961 0.963 0.964 0.965 0.966
-##     Major     2     4     2     1     0     2     1     0     1     2     1
-##     Minor     2     0     0     1     2     0     0     2     0     1     0
-##          
-## predicted 0.967 0.968 0.969 0.97 0.972 0.974 0.976 0.977 0.978 0.979 0.981
-##     Major     1     2     1    1     3     1     2     2     1     1     1
-##     Minor     0     0     0    2     2     1     1     0     0     0     0
-##          
-## predicted 0.982 0.984 0.985 0.988 0.999
-##     Major     0     1     1     1     1
-##     Minor     1     0     0     0     0</code></pre>
+## predicted    0    1
+##    0_pred 1344  295
+##    1_pred  105  256</code></pre>
 <pre class="r"><code>(cm[1, 2] + cm[2, 1]) / sum(cm)</code></pre>
-<pre><code>## [1] 5e-04</code></pre>
-<pre class="r"><code>mean(predicted != Data$energy)</code></pre>
+<pre><code>## [1] 0.2</code></pre>
+<pre class="r"><code>mean(predicted != Data$explicit)</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre class="r"><code>train &lt;- Data$year &lt; 2004
 Data_test &lt;- Data[!train,]
-Mode_test &lt;- Data$mode[!train]</code></pre>
-<pre class="r"><code>fit &lt;- glm(mode~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data, subset = train)
+Explicit_test &lt;- Data$explicit[!train]</code></pre>
+<pre class="r"><code>fit &lt;- glm(explicit~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data, subset = train)
 summary(fit)</code></pre>
 <pre><code>## 
 ## Call:
-## glm(formula = mode ~ energy + instrumentalness + liveness + tempo + 
-##     valence + danceability + duration_ms + year + popularity + 
+## glm(formula = explicit ~ energy + instrumentalness + liveness + 
+##     tempo + valence + danceability + duration_ms + year + popularity + 
 ##     loudness + speechiness + acousticness, family = binomial, 
 ##     data = Data, subset = train)
 ## 
 ## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -1.8916  -1.1102   0.6891   1.0788   1.6512  
+##      Min        1Q    Median        3Q       Max  
+## -2.22860  -0.48321  -0.29254  -0.00084   2.52910  
 ## 
 ## Coefficients:
-##                    Estimate Std. Error z value Pr(&gt;|z|)  
-## (Intercept)       5.482e+01  1.715e+02   0.320   0.7492  
-## energy           -1.367e+00  9.787e-01  -1.397   0.1624  
-## instrumentalness -7.341e-01  9.645e-01  -0.761   0.4466  
-## liveness          9.966e-01  7.674e-01   1.299   0.1941  
-## tempo             5.750e-03  3.885e-03   1.480   0.1389  
-## valence          -1.378e+00  6.220e-01  -2.216   0.0267 *
-## danceability     -1.681e+00  9.995e-01  -1.682   0.0926 .
-## duration_ms      -4.111e-06  2.737e-06  -1.502   0.1331  
-## year             -2.555e-02  8.553e-02  -0.299   0.7651  
-## popularity       -9.416e-03  8.026e-03  -1.173   0.2408  
-## loudness         -7.279e-02  6.730e-02  -1.082   0.2794  
-## speechiness       5.161e-01  1.172e+00   0.440   0.6597  
-## acousticness     -1.842e+00  7.210e-01  -2.554   0.0106 *
+##                    Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)      -1.098e+02  2.512e+02  -0.437  0.66202    
+## energy           -1.586e-01  1.481e+00  -0.107  0.91470    
+## instrumentalness -1.976e+01  1.298e+01  -1.522  0.12794    
+## liveness         -2.061e-01  1.135e+00  -0.182  0.85588    
+## tempo             5.069e-03  5.851e-03   0.866  0.38625    
+## valence          -7.456e-01  9.092e-01  -0.820  0.41215    
+## danceability      7.150e+00  1.621e+00   4.412 1.02e-05 ***
+## duration_ms       9.282e-06  4.144e-06   2.240  0.02509 *  
+## year              4.768e-02  1.253e-01   0.380  0.70363    
+## popularity        5.821e-02  1.776e-02   3.277  0.00105 ** 
+## loudness         -1.504e-01  9.947e-02  -1.512  0.13064    
+## speechiness       1.261e+01  1.711e+00   7.371 1.70e-13 ***
+## acousticness     -1.027e+00  1.054e+00  -0.974  0.33011    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 563.69  on 407  degrees of freedom
-## Residual deviance: 524.91  on 395  degrees of freedom
-## AIC: 550.91
+##     Null deviance: 447.55  on 407  degrees of freedom
+## Residual deviance: 270.60  on 395  degrees of freedom
+## AIC: 296.6
 ## 
-## Number of Fisher Scoring iterations: 4</code></pre>
+## Number of Fisher Scoring iterations: 8</code></pre>
 <pre class="r"><code>probs &lt;- predict(fit, Data_test, type = &quot;response&quot;)
-predicted &lt;- ifelse(probs &gt; 0.5, &quot;Major&quot;, &quot;Minor&quot;)
-table(predicted, Mode_test)</code></pre>
-<pre><code>##          Mode_test
-## predicted   0   1
-##     Major 415 543
-##     Minor 288 346</code></pre>
-<p>Następnie wyelominowano predyktary któe mają słabe p-wartości:</p>
+predicted &lt;- ifelse(probs &gt; 0.5, &quot;1_pred&quot;, &quot;0_pred&quot;)
+table(predicted, Explicit_test)</code></pre>
+<pre><code>##          Explicit_test
+## predicted    0    1
+##    0_pred 1006  246
+##    1_pred  132  208</code></pre>
+<p>Następnie wyelominowano predyktary które mają słabe p-wartości:</p>
+<pre class="r"><code>dir_log_best2 &lt;- list()
+dir_log_best2$fit &lt;- glm(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+summary(dir_log_best2$fit)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = explicit ~ energy + instrumentalness + tempo + 
+##     valence + danceability + duration_ms + year + acousticness, 
+##     data = Data, subset = train)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.7013  -0.2712  -0.1456   0.1889   0.9667  
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      -6.260e+01  3.060e+01  -2.046 0.041418 *  
+## energy           -1.302e-01  1.560e-01  -0.835 0.404161    
+## instrumentalness -3.977e-01  1.748e-01  -2.275 0.023411 *  
+## tempo             9.203e-04  7.034e-04   1.308 0.191510    
+## valence          -5.007e-02  1.147e-01  -0.437 0.662701    
+## danceability      1.100e+00  1.736e-01   6.335  6.4e-10 ***
+## duration_ms       1.763e-06  4.982e-07   3.539 0.000449 ***
+## year              3.083e-02  1.528e-02   2.018 0.044275 *  
+## acousticness     -8.803e-02  1.280e-01  -0.688 0.492054    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.1532572)
+## 
+##     Null deviance: 73.939  on 407  degrees of freedom
+## Residual deviance: 61.150  on 399  degrees of freedom
+## AIC: 403.49
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>dir_log_best2$probs &lt;- predict(dir_log_best2$fit, Data_test, type = &quot;response&quot;)
+dir_log_best2$predicted &lt;- ifelse(dir_log_best2$probs &gt; 0.5, &quot;1_pred&quot;, &quot;0_pred&quot;)
+table(dir_log_best2$predicted, Explicit_test)</code></pre>
+<pre><code>##         Explicit_test
+##            0   1
+##   0_pred 586 137
+##   1_pred 552 317</code></pre>
+<p>LDA</p>
+<pre class="r"><code>#dir_lda$fit &lt;- lda(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+#dir_lda$fit</code></pre>
+<pre class="r"><code>#dir_lda$predicted &lt;- predict(dir_lda$fit, Data_test)
+#table(dir_lda$predicted$class, Explicit_test)</code></pre>
+<p>Skuteczność LDA jest większa niż dla regresji logistycznej</p>
+<p>QDA</p>
+<pre class="r"><code>#dir_qda &lt;- list()
+#dir_qda$fit &lt;- qda(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+#dir_qda$fit</code></pre>
+<pre class="r"><code>#dir_qda$predicted &lt;- predict(dir_qda$fit, Data_test)
+#table(dir_qda$predicted$class, Explicit_test)</code></pre>
+<p>kNN</p>
+<pre class="r"><code>#train_set &lt;- Data[train, c(&quot;energy&quot;, &quot;instrumentalness&quot;, &quot;tempo&quot;, &quot;valence&quot;, &quot;danceability&quot;, &quot;year&quot;, &quot;acousticness&quot;)]
+#test_set &lt;- Data[!train, c(&quot;energy&quot;, &quot;instrumentalness&quot;, &quot;tempo&quot;, &quot;valence&quot;, &quot;danceability&quot;, &quot;year&quot;, &quot;acousticness&quot;)]
+#explicit_train &lt;- Data$explicit[train]
+#dir_knn_1 &lt;- knn(train_set, test_set, explicit_train, k = 1)
+#table(dir_knn_1, Explicit_test)</code></pre>
 
 
 

@@ -1,8 +1,10 @@
 ---
 title: "Podstawowe metody klasyfikacji"
-date: "2022"
-output: html_document
-autor: "Maciej Mucha, Łukasz Wroński"
+date: '2022'
+output:
+  html_document: default
+  pdf_document: default
+autor: Maciej Mucha, Łukasz Wroński
 ---
 
 Autorzy: Maciej Mucha, Łukasz Wroński
@@ -11,52 +13,109 @@ Import danych. Źródło: <https://www.kaggle.com/datasets/paradisejoy/top-hits-
 
 ```{r import}
 Data = read.csv("data.csv")
+Data$explicit <- as.integer(Data$explicit == "True")
 ```
 
 Wpływ zmiennych na `mode`, który przyjmuje wartości z przedziału [0,1]. Zmianna ta wskazuje modalność (durową lub molową) utworu, rodzaj skali, z której pochodzi jego zawartość melodyczna.
 
 ```{r}
-fit <- glm(mode~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data)
+fit <- glm(explicit~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data)
 summary(fit)
 ```
 
-Istotny wpływ na odpowiedż mają następujące predyktory, osiągające p-wartość mniejszą niż ???%:
+Istotny wpływ na odpowiedż mają następujące predyktory, osiągające p-wartość mniejszą niż 5%:
 
-
+| Predyktor        | p-wartość | współczynnik | wpływ           |
+|------------------|-----------|--------------|-----------------|
+| energy           | 0.000475  | -2.096e+00   | ujemny, duży    |
+| instrumentalness | 0.003038  | -5.583e+00   | ujemny, duży    |
+| valence          | 3.63e-06  | -1.544e+00   | ujemny, duży    |
+| danceability     | \< 2e-16  | 5.289e+00    | dodatni, duży   |
+| duration_ms      | 7.61e-08  | 8.687e-06    | dodatni, mały   |
+| year             | 0.000264  | 4.183e-02    | dodatni, średni |
+| speechiness      | \< 2e-16  | 9.549e+00    | dodatni, duży   |
+| acousticness     | 0.001588  | -1.288e+00   | ujemny, duży    |
 
 ```{r}
 probs = predict(fit, type = "response")
 head(probs)
 ```
+
 ```{r}
-predicted <- ifelse(probs > 0.5, "Major", "Minor")
+predicted <- ifelse(probs > 0.5, "1_pred", "0_pred")
 ```
 
-
 ```{r}
-cm <- table(predicted, Data$energy)
+cm <- table(predicted, Data$explicit)
 cm
 ```
+
 ```{r}
 (cm[1, 2] + cm[2, 1]) / sum(cm)
-mean(predicted != Data$energy)
+mean(predicted != Data$explicit)
 ```
+
 ```{r}
 train <- Data$year < 2004
 Data_test <- Data[!train,]
-Mode_test <- Data$mode[!train]
+Explicit_test <- Data$explicit[!train]
 ```
 
 ```{r}
-fit <- glm(mode~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data, subset = train)
+fit <- glm(explicit~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data, subset = train)
 summary(fit)
 ```
 
 ```{r}
 probs <- predict(fit, Data_test, type = "response")
-predicted <- ifelse(probs > 0.5, "Major", "Minor")
-table(predicted, Mode_test)
+predicted <- ifelse(probs > 0.5, "1_pred", "0_pred")
+table(predicted, Explicit_test)
 ```
 
-Następnie wyelominowano predyktary któe mają słabe p-wartości:
+Następnie wyelominowano predyktary które mają słabe p-wartości:
 
+```{r}
+dir_log_best2 <- list()
+dir_log_best2$fit <- glm(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+summary(dir_log_best2$fit)
+dir_log_best2$probs <- predict(dir_log_best2$fit, Data_test, type = "response")
+dir_log_best2$predicted <- ifelse(dir_log_best2$probs > 0.5, "1_pred", "0_pred")
+table(dir_log_best2$predicted, Explicit_test)
+```
+
+LDA
+
+```{r}
+#dir_lda$fit <- lda(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+#dir_lda$fit
+```
+
+```{r}
+#dir_lda$predicted <- predict(dir_lda$fit, Data_test)
+#table(dir_lda$predicted$class, Explicit_test)
+```
+
+Skuteczność LDA jest większa niż dla regresji logistycznej
+
+QDA
+
+```{r}
+#dir_qda <- list()
+#dir_qda$fit <- qda(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+#dir_qda$fit
+```
+
+```{r}
+#dir_qda$predicted <- predict(dir_qda$fit, Data_test)
+#table(dir_qda$predicted$class, Explicit_test)
+```
+
+kNN
+
+```{r}
+#train_set <- Data[train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
+#test_set <- Data[!train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
+#explicit_train <- Data$explicit[train]
+#dir_knn_1 <- knn(train_set, test_set, explicit_train, k = 1)
+#table(dir_knn_1, Explicit_test)
+```
