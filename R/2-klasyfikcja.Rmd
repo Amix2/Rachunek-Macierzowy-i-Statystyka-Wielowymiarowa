@@ -1,0 +1,62 @@
+---
+title: "Podstawowe metody klasyfikacji"
+date: "2022"
+output: html_document
+autor: "Maciej Mucha, Łukasz Wroński"
+---
+
+Autorzy: Maciej Mucha, Łukasz Wroński
+
+Import danych. Źródło: <https://www.kaggle.com/datasets/paradisejoy/top-hits-spotify-from-20002019>
+
+```{r import}
+Data = read.csv("data.csv")
+```
+
+Wpływ zmiennych na `mode`, który przyjmuje wartości z przedziału [0,1]. Zmianna ta wskazuje modalność (durową lub molową) utworu, rodzaj skali, z której pochodzi jego zawartość melodyczna.
+
+```{r}
+fit <- glm(mode~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data)
+summary(fit)
+```
+
+Istotny wpływ na odpowiedż mają następujące predyktory, osiągające p-wartość mniejszą niż ???%:
+
+
+
+```{r}
+probs = predict(fit, type = "response")
+head(probs)
+```
+```{r}
+predicted <- ifelse(probs > 0.5, "Major", "Minor")
+```
+
+
+```{r}
+cm <- table(predicted, Data$energy)
+cm
+```
+```{r}
+(cm[1, 2] + cm[2, 1]) / sum(cm)
+mean(predicted != Data$energy)
+```
+```{r}
+train <- Data$year < 2004
+Data_test <- Data[!train,]
+Mode_test <- Data$mode[!train]
+```
+
+```{r}
+fit <- glm(mode~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data, subset = train)
+summary(fit)
+```
+
+```{r}
+probs <- predict(fit, Data_test, type = "response")
+predicted <- ifelse(probs > 0.5, "Major", "Minor")
+table(predicted, Mode_test)
+```
+
+Następnie wyelominowano predyktary któe mają słabe p-wartości:
+
