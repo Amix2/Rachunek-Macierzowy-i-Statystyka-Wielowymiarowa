@@ -10,7 +10,6 @@
 
 
 
-<meta name="date" content="2022-01-01" />
 
 <title>Podstawowe metody klasyfikacji</title>
 
@@ -363,168 +362,156 @@ pre code {
 
 
 <h1 class="title toc-ignore">Podstawowe metody klasyfikacji</h1>
-<h4 class="date">2022</h4>
+<h4 class="date">Semestr letni 2021/22</h4>
 
 </div>
 
 
-<p>Autorzy: Maciej Mucha, Łukasz Wroński</p>
-<p>Import danych. Źródło: <a href="https://www.kaggle.com/datasets/paradisejoy/top-hits-spotify-from-20002019" class="uri">https://www.kaggle.com/datasets/paradisejoy/top-hits-spotify-from-20002019</a></p>
-<pre class="r"><code>Data = read.csv(&quot;data.csv&quot;)
-Data$explicit &lt;- as.integer(Data$explicit == &quot;True&quot;)</code></pre>
-<p>Wpływ zmiennych na <code>explicit</code>, który przyjmuje wartości z
-przedziału {true (1), false (0)}. Zmianna ta wskazuje wulgarnoć utworu i
-czy jest on odpowiedni dla dzieci</p>
-<pre class="r"><code>fit &lt;- glm(explicit~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data)
-summary(fit)</code></pre>
-<p>Istotny wpływ na odpowiedż mają następujące predyktory, osiągające
-p-wartość mniejszą niż 5%:</p>
-<table>
-<thead>
-<tr class="header">
-<th>Predyktor</th>
-<th>p-wartość</th>
-<th>współczynnik</th>
-<th>wpływ</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>energy</td>
-<td>0.000475</td>
-<td>-2.096e+00</td>
-<td>ujemny, duży</td>
-</tr>
-<tr class="even">
-<td>instrumentalness</td>
-<td>0.003038</td>
-<td>-5.583e+00</td>
-<td>ujemny, duży</td>
-</tr>
-<tr class="odd">
-<td>valence</td>
-<td>3.63e-06</td>
-<td>-1.544e+00</td>
-<td>ujemny, duży</td>
-</tr>
-<tr class="even">
-<td>danceability</td>
-<td>&lt; 2e-16</td>
-<td>5.289e+00</td>
-<td>dodatni, duży</td>
-</tr>
-<tr class="odd">
-<td>duration_ms</td>
-<td>7.61e-08</td>
-<td>8.687e-06</td>
-<td>dodatni, mały</td>
-</tr>
-<tr class="even">
-<td>year</td>
-<td>0.000264</td>
-<td>4.183e-02</td>
-<td>dodatni, średni</td>
-</tr>
-<tr class="odd">
-<td>speechiness</td>
-<td>&lt; 2e-16</td>
-<td>9.549e+00</td>
-<td>dodatni, duży</td>
-</tr>
-<tr class="even">
-<td>acousticness</td>
-<td>0.001588</td>
-<td>-1.288e+00</td>
-<td>ujemny, duży</td>
-</tr>
-</tbody>
-</table>
-<p>Przewidywane prawdopodobieństwa <span class="math inline">\(P(Y = 1 |
-X)\)</span></p>
-<pre class="r"><code>probs = predict(fit, type = &quot;response&quot;)
-head(probs)</code></pre>
-<p>Tablica pomyłek.</p>
-<pre class="r"><code>predicted &lt;- ifelse(probs &gt; 0.5, &quot;1&quot;, &quot;0&quot;)
-cm &lt;- table(predicted, Data$explicit)
-cm</code></pre>
-<p>Proporcja błędów.</p>
-<pre class="r"><code>(cm[1, 2] + cm[2, 1]) / sum(cm)
-mean(predicted != Data$explicit)</code></pre>
-<pre class="r"><code>train &lt;- Data$year &lt; 2004
-Data_test &lt;- Data[!train,]
-Explicit_test &lt;- Data$explicit[!train]</code></pre>
-<p>Regresja logarytmiczna</p>
-<pre class="r"><code>fit &lt;- glm(explicit~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data, subset = train)
-summary(fit)</code></pre>
-<pre class="r"><code>probs &lt;- predict(fit, Data_test, type = &quot;response&quot;)
-predicted &lt;- ifelse(probs &gt; 0.5, &quot;1&quot;, &quot;0&quot;)
-table(predicted, Explicit_test)</code></pre>
-<p>Następnie wyelominowano predyktary które mają słabe p-wartości:</p>
+<div id="dane" class="section level2">
+<h2>Dane</h2>
+<p>W trakcie zajęć wykorzystywany będzie zbiór danych
+<code>Smarket</code> z pakietu <code>ISLR</code>. Opisuje on zachowanie
+indeksu giełdowego S&amp;P 500 przez kolejne dni od roku 2001 do roku
+2005. Zmienna <code>Direction</code> jest czynnikiem o 2 poziomach
+podsumowującym kierunek zmiany indeksu w danym dniu, tzn.
+<code>Direction == &quot;Up&quot;</code> wtedy i tylko wtedy, gdy
+<code>Today &gt;= 0</code>. [<strong>Sprawdź</strong>]</p>
+<p>Obliczenie korelacji zmiennych numerycznych (innych niż
+<code>Direction</code>)</p>
+<pre class="r"><code>cor(Smarket[-9])</code></pre>
+<p>wskazuje na to, że zauważalna korelacja występuje tylko między
+zmiennymi <code>Year</code> i <code>Volume</code>. Wykres
+rozproszenia</p>
+<pre class="r"><code>plot(Smarket$Volume)</code></pre>
+<p>pokazuje, że <code>Volume</code> rośnie w czasie.</p>
+</div>
+<div id="regresja-logistyczna" class="section level2">
+<h2>Regresja logistyczna</h2>
+<p>Chcemy dopasować model regresji logistycznej żeby przewidzieć wartość
+<code>Direction</code> na podstawie zmiennych <code>Lag1</code>, …,
+<code>Lag5</code> i <code>Volume</code>.</p>
+<pre class="r"><code>dir_logistic &lt;- list()
+dir_logistic$fit &lt;- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, 
+                   family = binomial, data = Smarket)
+summary(dir_logistic$fit)</code></pre>
+<p>[<strong>Zinterpretuj wyniki</strong>]</p>
+<p>Do predykcji — podobnie jak w regresji liniowej — wykorzystywana jest
+funkcja <code>predict()</code>. Przy wartości parametru
+<code>type = &quot;response&quot;</code> funkcja zwraca przewidywane
+prawdopodobieństwa <span class="math inline">\(P(Y = 1 | X)\)</span> (a
+nie np. szanse logarytmiczne).</p>
+<pre class="r"><code>dir_logistic$probs &lt;- predict(dir_logistic$fit, type = &quot;response&quot;)
+head(dir_logistic$probs)</code></pre>
+<p>Warto się upewnić czy <span class="math inline">\(Y = 1\)</span>
+oznacza <code>Direction == &quot;Up&quot;</code></p>
+<pre class="r"><code>contrasts(Smarket$Direction)</code></pre>
+<p>Ostatecznie przewidywane przypisanie do klas uzyskujemy stosując
+bayesowską regułę decyzyjną (<em>maximum a posteriori</em>).</p>
+<pre class="r"><code>dir_logistic$predicted &lt;- ifelse(dir_logistic$probs &gt; 0.5, &quot;UpQ&quot;, &quot;DownQ&quot;)</code></pre>
+<p>Do zobrazowania wyników klasyfikacji używamy <em>tablicy pomyłek</em>
+(<em>confusion matrix</em>)</p>
+<pre class="r"><code>dir_logistic$cm &lt;- table(dir_logistic$predicted, Smarket$Direction)
+dir_logistic$cm</code></pre>
+<p><em>Proporcję błędów</em> można policzyć np. na jeden z poniższych
+sposobów.</p>
+<pre class="r"><code>(dir_logistic$cm[1, 2] + dir_logistic$cm[2, 1]) / sum(dir_logistic$cm)
+mean(dir_logistic$predicted != Smarket$Direction)</code></pre>
+<p>Niestety powyższa proporcja błędów jest <em>treningową proporcją
+błędów</em>. Do estymacji <em>testowej proporcji błędów</em> zastosujemy
+podział dostępnych danych na:</p>
+<ul>
+<li><p>zbiór uczący — dane od 2001 do 2004 roku;</p></li>
+<li><p>zbiór testowy — dane z 2005 roku.</p></li>
+</ul>
+<pre class="r"><code>train &lt;- Smarket$Year &lt; 2005
+Smarket_test &lt;- Smarket[!train,]
+Direction_test &lt;- Smarket$Direction[!train]</code></pre>
+<p>Regresję wykonujemy na podstawie zbioru uczącego</p>
+<pre class="r"><code>dir_log_t &lt;- list()
+dir_log_t$fit &lt;- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, 
+                   family = binomial, data = Smarket, subset = train)
+summary(dir_log_t$fit)</code></pre>
+<p>a otrzymany model wykorzystujemy do predykcji dla danych ze zbioru
+testowego</p>
+<pre class="r"><code>dir_log_t$probs &lt;- predict(dir_log_t$fit, Smarket_test, type = &quot;response&quot;)
+dir_log_t$predicted &lt;- ifelse(dir_log_t$probs &gt; 0.5, &quot;Up&quot;, &quot;Down&quot;)
+table(dir_log_t$predicted, Direction_test)</code></pre>
+<p>[<strong>Jaka jest zatem proporcja błędów dla takiego zbioru
+testowego?</strong>]</p>
+<p>Próbujemy uzyskać bardziej efektywny model eliminując najmniej
+istotne predyktory — wszystkie mają słabe lub bardzo słabe <span class="math inline">\(p\)</span>-wartości, ale najlepsze dwa to
+<code>Lag1</code> i <code>Lag2</code>.</p>
 <pre class="r"><code>dir_log_best2 &lt;- list()
-dir_log_best2$fit &lt;- glm(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, family = binomial, data = Data, subset = train)
+dir_log_best2$fit &lt;- glm(Direction ~ Lag1 + Lag2, family = binomial, 
+                    data = Smarket, subset = train)
 summary(dir_log_best2$fit)
-dir_log_best2$probs &lt;- predict(dir_log_best2$fit, Data_test, type = &quot;response&quot;)
-dir_log_best2$predicted &lt;- ifelse(dir_log_best2$probs &gt; 0.5, &quot;1&quot;, &quot;0&quot;)
-table(dir_log_best2$predicted, Explicit_test)
-dir_log_best2$cm &lt;-table(dir_log_best2$predicted, Explicit_test)
-(dir_log_best2$cm[1, 2] + dir_log_best2$cm[2, 1]) / sum(dir_log_best2$cm)
-mean(dir_log_best2$predicted != Explicit_test)</code></pre>
-<p>LDA Zastosowanie LDA do klasyfikacji wyznaczonej przez
-<code>explicit</code> względem predyktorów opisanych powyżej</p>
+dir_log_best2$probs &lt;- predict(dir_log_best2$fit, Smarket_test, type = &quot;response&quot;)
+dir_log_best2$predicted &lt;- ifelse(dir_log_best2$probs &gt; 0.5, &quot;Up&quot;, &quot;Down&quot;)
+table(dir_log_best2$predicted, Direction_test)</code></pre>
+<p>[<strong>Jak w tym przypadku wygląda proporcja błędów? Jak wygląda
+jej porównanie z proporcją błędów naiwnej strategii przewidującej wzrost
+zawsze?</strong>]</p>
+<pre class="r"><code>mean(Direction_test != &quot;Up&quot;)</code></pre>
+<p>[<strong>Jaką strategię inwestowania można zasugerować na podstawie
+ostatniej tabeli pomyłek?</strong>]</p>
+</div>
+<div id="lda-i-qda" class="section level2">
+<h2>LDA i QDA</h2>
+<p>Funkcje <code>lda()</code> i <code>qda()</code> są zaimplementowane w
+pakiecie <code>MASS</code>.</p>
+<div id="lda" class="section level3">
+<h3>LDA</h3>
+<p>W sytuacji jak poprzednio stosujemy LDA do klasyfikacji wyznaczonej
+przez <code>Direction</code> względem <code>Lag1</code> i
+<code>Lag2</code>.</p>
 <pre class="r"><code>dir_lda &lt;- list()
-dir_lda$fit &lt;- lda(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+dir_lda$fit &lt;- lda(Direction ~ Lag1 + Lag2, data = Smarket, subset = train)
 dir_lda$fit</code></pre>
-<pre class="r"><code>dir_lda$predicted &lt;- predict(dir_lda$fit, Data_test)
-table(dir_lda$predicted$class, Explicit_test)</code></pre>
-<pre class="r"><code>dir_lda$cm &lt;-table(dir_lda$predicted$class, Explicit_test)
-(dir_lda$cm[1, 2] + dir_lda$cm[2, 1]) / sum(dir_lda$cm)
-mean(dir_lda$predicted$class != Explicit_test)</code></pre>
-<p>LDA osiągnęlo minimalnie gorszą dokałdność niż regresja
-logarytmiczna</p>
-<p>QDA</p>
+<p>Predykcję wykonuje funkcja <code>predict.lda()</code>. Zwraca ona
+listę, której komponentami są: wektor przewidywanych klas
+<code>class</code>, wektor prawdopodobieństw a posteriori
+<code>posterior</code> i wektor wartości liniowego dyskryminatora
+<code>x</code>.</p>
+<pre class="r"><code>dir_lda$predicted &lt;- predict(dir_lda$fit, Smarket_test)
+table(dir_lda$predicted$class, Direction_test)</code></pre>
+<p>[<strong>Jak wygląda porównanie wyniku klasyfikacji LDA z regresją
+logistyczną?</strong>]</p>
+<p>Maksymalne przewidywane prawdopodobieństwo wzrostu w 2005</p>
+<pre class="r"><code>max(dir_lda$predicted$posterior[, 2])</code></pre>
+<p>Maksymalne przewidywane prawdopodobieństwo spadku w 2005</p>
+<pre class="r"><code>max(dir_lda$predicted$posterior[, 1])</code></pre>
+</div>
+<div id="qda" class="section level3">
+<h3>QDA</h3>
+<p>Ten sam problem z kwadratowym dyskryminatorem</p>
 <pre class="r"><code>dir_qda &lt;- list()
-dir_qda$fit &lt;- qda(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+dir_qda$fit &lt;- qda(Direction ~ Lag1 + Lag2, data = Smarket, subset = train)
 dir_qda$fit</code></pre>
-<pre class="r"><code>dir_qda$predicted &lt;- predict(dir_qda$fit, Data_test)
-table(dir_qda$predicted$class, Explicit_test)
-dir_qda$cm &lt;-table(dir_qda$predicted$class, Explicit_test)
-(dir_qda$cm[1, 2] + dir_qda$cm[2, 1]) / sum(dir_qda$cm)
-mean(dir_qda$predicted$class != Explicit_test)</code></pre>
-<p>QDA ma większą dokładność niż LDA i regresja logarytmiczna</p>
-<p>kNN</p>
-<p>dla k=1</p>
-<pre class="r"><code>train_set &lt;- Data[train, c(&quot;energy&quot;, &quot;instrumentalness&quot;, &quot;tempo&quot;, &quot;valence&quot;, &quot;danceability&quot;, &quot;year&quot;, &quot;acousticness&quot;)]
-test_set &lt;- Data[!train, c(&quot;energy&quot;, &quot;instrumentalness&quot;, &quot;tempo&quot;, &quot;valence&quot;, &quot;danceability&quot;, &quot;year&quot;, &quot;acousticness&quot;)]
-explicit_train &lt;- Data$explicit[train]
-Explicit_test &lt;- Data$explicit[!train]
-dir_knn_1 &lt;- knn(train_set, test_set, explicit_train, k = 1)
-table(dir_knn_1, Explicit_test)
-mean(dir_knn_1 != Explicit_test)</code></pre>
-<p>dla k=3</p>
-<pre class="r"><code>train_set &lt;- Data[train, c(&quot;energy&quot;, &quot;instrumentalness&quot;, &quot;tempo&quot;, &quot;valence&quot;, &quot;danceability&quot;, &quot;year&quot;, &quot;acousticness&quot;)]
-test_set &lt;- Data[!train, c(&quot;energy&quot;, &quot;instrumentalness&quot;, &quot;tempo&quot;, &quot;valence&quot;, &quot;danceability&quot;, &quot;year&quot;, &quot;acousticness&quot;)]
-explicit_train &lt;- Data$explicit[train]
-Explicit_test &lt;- Data$explicit[!train]
-dir_knn_3 &lt;- knn(train_set, test_set, explicit_train, k = 3)
-table(dir_knn_3, Explicit_test)
-mean(dir_knn_3 != Explicit_test)</code></pre>
-<p>dla k=6</p>
-<pre class="r"><code>train_set &lt;- Data[train, c(&quot;energy&quot;, &quot;instrumentalness&quot;, &quot;tempo&quot;, &quot;valence&quot;, &quot;danceability&quot;, &quot;year&quot;, &quot;acousticness&quot;)]
-test_set &lt;- Data[!train, c(&quot;energy&quot;, &quot;instrumentalness&quot;, &quot;tempo&quot;, &quot;valence&quot;, &quot;danceability&quot;, &quot;year&quot;, &quot;acousticness&quot;)]
-explicit_train &lt;- Data$explicit[train]
-Explicit_test &lt;- Data$explicit[!train]
-dir_knn_6 &lt;- knn(train_set, test_set, explicit_train, k = 6)
-table(dir_knn_6, Explicit_test)
-mean(dir_knn_6 != Explicit_test)</code></pre>
-<p>dla k=16</p>
-<pre class="r"><code>train_set &lt;- Data[train, c(&quot;energy&quot;, &quot;instrumentalness&quot;, &quot;tempo&quot;, &quot;valence&quot;, &quot;danceability&quot;, &quot;year&quot;, &quot;acousticness&quot;)]
-test_set &lt;- Data[!train, c(&quot;energy&quot;, &quot;instrumentalness&quot;, &quot;tempo&quot;, &quot;valence&quot;, &quot;danceability&quot;, &quot;year&quot;, &quot;acousticness&quot;)]
-explicit_train &lt;- Data$explicit[train]
-Explicit_test &lt;- Data$explicit[!train]
-dir_knn_16 &lt;- knn(train_set, test_set, explicit_train, k = 16)
-table(dir_knn_16, Explicit_test)
-mean(dir_knn_16 != Explicit_test)</code></pre>
-<p>KNN dla k więszych niż 3 osoga wyniki lepsze niż pozostałe metody</p>
+<p>I predykcja</p>
+<pre class="r"><code>dir_qda$predicted &lt;- predict(dir_qda$fit, Smarket_test)
+table(dir_qda$predicted$class, Direction_test)</code></pre>
+<p>[<strong>Jaka jest w tym przypadku proporcja błędów?</strong>]</p>
+</div>
+</div>
+<div id="knn" class="section level2">
+<h2>kNN</h2>
+<p>W tym przypadku nie ma jawnego etapu dopasowania. Funkcja
+<code>knn()</code> z pakietu <code>class</code> od razu wykonuje
+predykcję. Np. ze zbiorem uczącym i testowym jak poprzednio i z <span class="math inline">\(k = 1\)</span> mamy</p>
+<pre class="r"><code>train_set &lt;- Smarket[train, c(&quot;Lag1&quot;, &quot;Lag2&quot;)]
+test_set &lt;- Smarket[!train, c(&quot;Lag1&quot;, &quot;Lag2&quot;)]
+Direction_train &lt;- Smarket$Direction[train]
+dir_knn_1 &lt;- knn(train_set, test_set, Direction_train, k = 1)
+table(dir_knn_1, Direction_test)</code></pre>
+<p>Ze względu na to, że kNN rozstrzyga remisy losowo, dla zapewnienia
+powtarzalności wyników warto przed wywołaniem funkcji <code>knn</code>
+zainicjalizować generator liczb pseudolosowych
+(<code>?set.seed</code>).</p>
+<p>Proporcja błędów dla kNN z <span class="math inline">\(k = 1\)</span>
+nie jest imponująca</p>
+<pre class="r"><code>mean(dir_knn_1 != Direction_test)</code></pre>
+<p>[<strong>Jak wygląda proporcja błędów dla <span class="math inline">\(k = 3\)</span>? A dla większych <span class="math inline">\(k\)</span>?</strong>]</p>
+</div>
 
 
 

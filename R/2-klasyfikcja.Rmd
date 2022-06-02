@@ -1,11 +1,17 @@
 ---
 title: "Podstawowe metody klasyfikacji"
 date: '2022'
-output:
-  html_document: default
-  pdf_document: default
+output: html_document
 autor: Maciej Mucha, Łukasz Wroński
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+library(MASS)
+library(ISLR)
+library(class)
+
+```
 
 Autorzy: Maciej Mucha, Łukasz Wroński
 
@@ -16,7 +22,7 @@ Data = read.csv("data.csv")
 Data$explicit <- as.integer(Data$explicit == "True")
 ```
 
-Wpływ zmiennych na `mode`, który przyjmuje wartości z przedziału [0,1]. Zmianna ta wskazuje modalność (durową lub molową) utworu, rodzaj skali, z której pochodzi jego zawartość melodyczna.
+Wpływ zmiennych na `explicit`, który przyjmuje wartości z przedziału {true (1), false (0)}. Zmianna ta wskazuje wulgarnoć utworu i czy jest on odpowiedni dla dzieci
 
 ```{r}
 fit <- glm(explicit~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data)
@@ -36,19 +42,22 @@ Istotny wpływ na odpowiedż mają następujące predyktory, osiągające p-wart
 | speechiness      | \< 2e-16  | 9.549e+00    | dodatni, duży   |
 | acousticness     | 0.001588  | -1.288e+00   | ujemny, duży    |
 
+Przewidywane prawdopodobieństwa $P(Y = 1 | X)$
+
 ```{r}
 probs = predict(fit, type = "response")
 head(probs)
 ```
 
-```{r}
-predicted <- ifelse(probs > 0.5, "1_pred", "0_pred")
-```
+Tablica pomyłek.
 
 ```{r}
+predicted <- ifelse(probs > 0.5, "1", "0")
 cm <- table(predicted, Data$explicit)
 cm
 ```
+
+Proporcja błędów.
 
 ```{r}
 (cm[1, 2] + cm[2, 1]) / sum(cm)
@@ -61,6 +70,8 @@ Data_test <- Data[!train,]
 Explicit_test <- Data$explicit[!train]
 ```
 
+Regresja logarytmiczna
+
 ```{r}
 fit <- glm(explicit~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data, subset = train)
 summary(fit)
@@ -68,7 +79,7 @@ summary(fit)
 
 ```{r}
 probs <- predict(fit, Data_test, type = "response")
-predicted <- ifelse(probs > 0.5, "1_pred", "0_pred")
+predicted <- ifelse(probs > 0.5, "1", "0")
 table(predicted, Explicit_test)
 ```
 
@@ -76,46 +87,103 @@ Następnie wyelominowano predyktary które mają słabe p-wartości:
 
 ```{r}
 dir_log_best2 <- list()
-dir_log_best2$fit <- glm(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+dir_log_best2$fit <- glm(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, family = binomial, data = Data, subset = train)
 summary(dir_log_best2$fit)
 dir_log_best2$probs <- predict(dir_log_best2$fit, Data_test, type = "response")
-dir_log_best2$predicted <- ifelse(dir_log_best2$probs > 0.5, "1_pred", "0_pred")
+dir_log_best2$predicted <- ifelse(dir_log_best2$probs > 0.5, "1", "0")
 table(dir_log_best2$predicted, Explicit_test)
+dir_log_best2$cm <-table(dir_log_best2$predicted, Explicit_test)
+(dir_log_best2$cm[1, 2] + dir_log_best2$cm[2, 1]) / sum(dir_log_best2$cm)
+mean(dir_log_best2$predicted != Explicit_test)
 ```
 
-LDA
+LDA Zastosowanie LDA do klasyfikacji wyznaczonej przez `explicit` względem predyktorów opisanych powyżej
 
 ```{r}
-#dir_lda$fit <- lda(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
-#dir_lda$fit
+dir_lda <- list()
+dir_lda$fit <- lda(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+dir_lda$fit
 ```
 
 ```{r}
-#dir_lda$predicted <- predict(dir_lda$fit, Data_test)
-#table(dir_lda$predicted$class, Explicit_test)
+dir_lda$predicted <- predict(dir_lda$fit, Data_test)
+table(dir_lda$predicted$class, Explicit_test)
 ```
 
-Skuteczność LDA jest większa niż dla regresji logistycznej
+```{r}
+dir_lda$cm <-table(dir_lda$predicted$class, Explicit_test)
+(dir_lda$cm[1, 2] + dir_lda$cm[2, 1]) / sum(dir_lda$cm)
+mean(dir_lda$predicted$class != Explicit_test)
+```
+
+LDA osiągnęlo minimalnie gorszą dokałdność niż regresja logarytmiczna
 
 QDA
 
 ```{r}
-#dir_qda <- list()
-#dir_qda$fit <- qda(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
-#dir_qda$fit
+dir_qda <- list()
+dir_qda$fit <- qda(explicit~energy+instrumentalness+tempo+valence+danceability+duration_ms+year+acousticness, data = Data, subset = train)
+dir_qda$fit
 ```
 
 ```{r}
-#dir_qda$predicted <- predict(dir_qda$fit, Data_test)
-#table(dir_qda$predicted$class, Explicit_test)
+dir_qda$predicted <- predict(dir_qda$fit, Data_test)
+table(dir_qda$predicted$class, Explicit_test)
+dir_qda$cm <-table(dir_qda$predicted$class, Explicit_test)
+(dir_qda$cm[1, 2] + dir_qda$cm[2, 1]) / sum(dir_qda$cm)
+mean(dir_qda$predicted$class != Explicit_test)
 ```
+
+QDA ma większą dokładność niż LDA i regresja logarytmiczna
 
 kNN
 
+dla k=1
+
 ```{r}
-#train_set <- Data[train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
-#test_set <- Data[!train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
-#explicit_train <- Data$explicit[train]
-#dir_knn_1 <- knn(train_set, test_set, explicit_train, k = 1)
-#table(dir_knn_1, Explicit_test)
+train_set <- Data[train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
+test_set <- Data[!train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
+explicit_train <- Data$explicit[train]
+Explicit_test <- Data$explicit[!train]
+dir_knn_1 <- knn(train_set, test_set, explicit_train, k = 1)
+table(dir_knn_1, Explicit_test)
+mean(dir_knn_1 != Explicit_test)
 ```
+
+dla k=3
+
+```{r}
+train_set <- Data[train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
+test_set <- Data[!train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
+explicit_train <- Data$explicit[train]
+Explicit_test <- Data$explicit[!train]
+dir_knn_3 <- knn(train_set, test_set, explicit_train, k = 3)
+table(dir_knn_3, Explicit_test)
+mean(dir_knn_3 != Explicit_test)
+```
+
+dla k=6
+
+```{r}
+train_set <- Data[train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
+test_set <- Data[!train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
+explicit_train <- Data$explicit[train]
+Explicit_test <- Data$explicit[!train]
+dir_knn_6 <- knn(train_set, test_set, explicit_train, k = 6)
+table(dir_knn_6, Explicit_test)
+mean(dir_knn_6 != Explicit_test)
+```
+
+dla k=16
+
+```{r}
+train_set <- Data[train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
+test_set <- Data[!train, c("energy", "instrumentalness", "tempo", "valence", "danceability", "year", "acousticness")]
+explicit_train <- Data$explicit[train]
+Explicit_test <- Data$explicit[!train]
+dir_knn_16 <- knn(train_set, test_set, explicit_train, k = 16)
+table(dir_knn_16, Explicit_test)
+mean(dir_knn_16 != Explicit_test)
+```
+
+KNN dla k więszych niż 3 osoga wyniki lepsze niż pozostałe metody
