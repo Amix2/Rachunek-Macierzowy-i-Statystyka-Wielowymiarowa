@@ -20,14 +20,15 @@ Import danych. Źródło: <https://www.kaggle.com/datasets/paradisejoy/top-hits-
 
 ```{r import}
 Data = read.csv("data.csv")
-Data = Data[1:100,]
+Data <- na.omit(Data)
+Data = Data[,3:17]
 Data$explicit <- as.integer(Data$explicit == "True")
 ```
 
 Wybór najepszego podzbioru
 
-
 ```{r}
-songs_bs <- regsubsets(loudness ~ ., data = Data, nvmax = 8)
+songs_bs <- regsubsets(loudness ~ ., data = Data, really.big = TRUE, nvmax=15)
 songs_bs_sum <- summary(songs_bs)
 songs_bs_sum
+```
