@@ -1,0 +1,33 @@
+---
+title: "Zastosowanie selekcji cech i regularyzacji"
+date: '2022'
+output: html_document
+autor: Maciej Mucha, Łukasz Wroński
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+library(MASS)
+library(ISLR)
+library(class)
+library(leaps)
+
+```
+
+Autorzy: Maciej Mucha, Łukasz Wroński
+
+Import danych. Źródło: <https://www.kaggle.com/datasets/paradisejoy/top-hits-spotify-from-20002019>
+
+```{r import}
+Data = read.csv("data.csv")
+Data = Data[1:100,]
+Data$explicit <- as.integer(Data$explicit == "True")
+```
+
+Wybór najepszego podzbioru
+
+
+```{r}
+songs_bs <- regsubsets(loudness ~ ., data = Data, nvmax = 8)
+songs_bs_sum <- summary(songs_bs)
+songs_bs_sum
