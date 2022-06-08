@@ -32,3 +32,56 @@ songs_bs <- regsubsets(loudness ~ ., data = Data, really.big = TRUE, nvmax=15)
 songs_bs_sum <- summary(songs_bs)
 songs_bs_sum
 ```
+
+```{r}
+songs_bs_sum$cp
+```
+
+```{r}
+bic_min <- which.min(songs_bs_sum$bic)
+bic_min
+songs_bs_sum$bic[bic_min]
+```
+
+```{r}
+plot(songs_bs_sum$bic, xlab = "Liczba zmiennych", ylab = "BIC", col = "green",
+     type = "b", pch = 20)
+points(bic_min, songs_bs_sum$bic[bic_min], col = "red", pch = 9)
+
+```
+```{r}
+plot(songs_bs, scale = "bic")
+```
+Najbardziej istotne predykaty to:
+
+- year
+- energy
+- speechiness
+- instrumentalness
+
+
+# Selekcja krokowa do przodu i wstecz
+
+
+```{r}
+songs_fwd <- regsubsets(loudness ~ ., data = Data, really.big = TRUE, nvmax=15,
+                          method = "forward")
+songs_fwd_sum <- summary(songs_fwd)
+songs_fwd_sum
+songs_back <- regsubsets(loudness ~ ., data = Data, really.big = TRUE, nvmax=15,
+                           method = "backward")
+songs_back_sum <- summary(songs_back)
+songs_back_sum
+```
+
+Wykres dla selekcji krokowej do przodu 
+```{r}
+plot(songs_fwd, scale = "bic")
+```
+Wykres dla selekcji krokowej do tyłu 
+
+```{r}
+plot(songs_back, scale = "bic")
+```
+
+
