@@ -49,19 +49,19 @@ plot(songs_bs_sum$bic, xlab = "Liczba zmiennych", ylab = "BIC", col = "green",
 points(bic_min, songs_bs_sum$bic[bic_min], col = "red", pch = 9)
 
 ```
+
 ```{r}
 plot(songs_bs, scale = "bic")
 ```
+
 Najbardziej istotne predykaty to:
 
-- year
-- energy
-- speechiness
-- instrumentalness
-
+-   year
+-   energy
+-   speechiness
+-   instrumentalness
 
 # Selekcja krokowa do przodu i wstecz
-
 
 ```{r}
 songs_fwd <- regsubsets(loudness ~ ., data = Data, really.big = TRUE, nvmax=15,
@@ -74,14 +74,57 @@ songs_back_sum <- summary(songs_back)
 songs_back_sum
 ```
 
-Wykres dla selekcji krokowej do przodu 
+Wykres dla selekcji krokowej do przodu
+
 ```{r}
 plot(songs_fwd, scale = "bic")
 ```
-Wykres dla selekcji krokowej do tyłu 
+
+Wykres dla selekcji krokowej do tyłu
 
 ```{r}
 plot(songs_back, scale = "bic")
 ```
 
+## LASSO
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+library(ISLR)
+library(glmnet)
+Data = read.csv("data.csv")
+Data = Data[,3:17]
+Data <- na.omit(Data)
+```
+Tworzenie macierzy X
+```{r modelmatrix}
+X <- model.matrix(Data$popularity ~ ., data=Data)[, -1]
+y <- Data$popularity
+```
 
+```{r}
+set.seed(2)
+n <- nrow(X)
+train <- sample(n, n / 2)
+test <- -train
+```
+
+Dopasowujemy lasso dla ustalonej siatki parametrów regularyzacji
+```{r}
+fit_lasso <- glmnet(X[train,], y[train], alpha = 1)
+plot(fit_lasso, xvar = "lambda")
+```
+
+```{r}
+cv_out <- cv.glmnet(X[train,], y[train], alpha = 1)
+plot(cv_out)
+cv_out$lambda.min
+pred_lasso <- predict(fit_lasso, s = cv_out$lambda.min, newx = X[test,])
+mean((pred_lasso - y[test])^2)
+```
+
+
+```{r}
+predict(fit_lasso, s = cv_out$lambda.min, newx = X[test,], type = "coefficients")
+```
+
+Najlepsza okazaa się kompinacja 4 predyntkrów: duration_ms, loudness, acousticness, instrumentalness                       
