@@ -1,0 +1,83 @@
+---
+title: "Zastosowanie selekcji cech i regularyzacji"
+date: '2022'
+output: html_document
+autor: Maciej Mucha, Łukasz Wroński
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+library(ISLR)
+library(MASS)
+library(tree)
+library(randomForest)
+library(gbm)
+```
+
+Autorzy: Maciej Mucha, Łukasz Wroński
+
+Import danych. Źródło: <https://www.kaggle.com/datasets/paradisejoy/top-hits-spotify-from-20002019>
+
+```{r import}
+Data = read.csv("data.csv")
+Data <- na.omit(Data)
+Data = Data[,3:17]
+Data$explicit <- as.integer(Data$explicit == "True")
+```
+
+Dodanie kolumny czy utwór jest popularny czy nie 
+```{r}
+IsPopular <- factor(ifelse(Data$popularity > 80, "Yes", "No"))
+DataPolularH <- data.frame(Data, IsPopular)
+```
+
+Tworzenie drzewa:
+``` {r}
+is_popular_tree <- tree(IsPopular ~ . - popularity, data = DataPolularH)
+summary(is_popular_tree)
+```
+
+Powstale drzewo:
+
+```{r plottree}
+plot(is_popular_tree)
+text(is_popular_tree, pretty = 0)
+```
+
+
+```{r print_tree}
+is_popular_tree
+```
+
+```{r classtreeerror}
+set.seed(1)
+n <- nrow(DataPolularH)
+train <- sample(n, n / 2)
+test <- -train
+is_popular_tree <- tree(IsPopular ~ . - popularity, data = DataPolularH)
+tree_class <- predict(is_popular_tree, newdata = DataPolularH[test,], type = "class")
+table(tree_class, DataPolularH$IsPopular[test])
+mean(tree_class != DataPolularH$IsPopular[test])
+```
+### Lasy losowe 
+```{r bigclasstree}
+plot(is_popular_tree)
+text(is_popular_tree, pretty = 0)
+```
+
+```{r classtreecv}
+set.seed(1)
+is_pop_cv <- cv.tree(is_popular_tree, FUN = prune.misclass)
+is_pop_cv
+plot(is_pop_cv$size, is_popular_tree$dev, type = "b")
+```
+Najlepsze obcięte drzewo 
+```{r class.tree.prune}
+size_opt <- sales_high_cv$size[which.min(is_pop_cv$dev)]
+is_pop_pruned <- prune.misclass(is_popular_tree, best = size_opt)
+plot(is_pop_pruned)
+text(is_pop_pruned, pretty = 0)
+```
+
+
+
