@@ -81,3 +81,23 @@ text(is_pop_pruned, pretty = 0)
 
 ### Lasy losowe 
 
+
+
+Boosting
+```{r}
+medv_boost <- gbm(IsPopular ~ . - popularity, data = DataPolularH, distribution = "gaussian",
+                  n.trees = 5000, interaction.depth = 4)
+medv_boost
+```
+
+
+```{r}
+summary(medv_boost)
+```
+
+
+```{r}
+plot(medv_boost, i.var = "year")
+plot(medv_boost, i.var = "energy")
+plot(medv_boost, i.var = c("year", "energy"))
+```
