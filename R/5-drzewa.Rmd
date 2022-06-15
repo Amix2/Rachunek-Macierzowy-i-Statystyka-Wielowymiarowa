@@ -83,7 +83,14 @@ text(is_pop_pruned, pretty = 0)
 
 
 
-Boosting
+Boosting:
+
+* `distribution`: `"gaussian"` dla regresji z RSS, `"bernoulli"` dla regresji typu logistycznego;
+
+* `n.trees`: liczba hodowanych drzew (B);
+
+* `interaction.depth`: głębokość interakcji (d);
+
 ```{r}
 medv_boost <- gbm(IsPopular ~ . - popularity, data = DataPolularH, distribution = "gaussian",
                   n.trees = 5000, interaction.depth = 4)
@@ -94,7 +101,7 @@ medv_boost
 ```{r}
 summary(medv_boost)
 ```
-
+Najistotniejszym predykatem jest `year` oraz `tempo`.
 
 ```{r}
 plot(medv_boost, i.var = "year")
