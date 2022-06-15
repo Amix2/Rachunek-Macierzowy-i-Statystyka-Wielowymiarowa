@@ -59,7 +59,7 @@ tree_class <- predict(is_popular_tree, newdata = DataPolularH[test,], type = "cl
 table(tree_class, DataPolularH$IsPopular[test])
 mean(tree_class != DataPolularH$IsPopular[test])
 ```
-### Lasy losowe 
+
 ```{r bigclasstree}
 plot(is_popular_tree)
 text(is_popular_tree, pretty = 0)
@@ -73,11 +73,11 @@ plot(is_pop_cv$size, is_popular_tree$dev, type = "b")
 ```
 Najlepsze obcięte drzewo 
 ```{r class.tree.prune}
-size_opt <- sales_high_cv$size[which.min(is_pop_cv$dev)]
+size_opt <- is_pop_cv$size[which.min(is_pop_cv$dev)-1]
 is_pop_pruned <- prune.misclass(is_popular_tree, best = size_opt)
 plot(is_pop_pruned)
 text(is_pop_pruned, pretty = 0)
 ```
 
-
+### Lasy losowe 
 
