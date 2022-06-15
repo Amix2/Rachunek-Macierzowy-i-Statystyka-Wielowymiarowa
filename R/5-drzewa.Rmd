@@ -101,7 +101,7 @@ medv_boost
 ```{r}
 summary(medv_boost)
 ```
-Najistotniejszym predykatem jest `year` oraz `tempo`.
+Najistotniejszym predykatem jest `acounsticness`, `year` oraz `duration`.
 
 ```{r}
 plot(medv_boost, i.var = "year")
