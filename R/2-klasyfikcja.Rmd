@@ -22,7 +22,7 @@ Data = read.csv("data.csv")
 Data$explicit <- as.integer(Data$explicit == "True")
 ```
 
-Wpływ zmiennych na `explicit`, który przyjmuje wartości z przedziału {true (1), false (0)}. Zmianna ta wskazuje wulgarnoć utworu i czy jest on odpowiedni dla dzieci
+Wpływ zmiennych na `explicit`, który przyjmuje wartości z przedziału {true (1), false (0)}. Zmianna ta wskazuje wulgarność utworu i czy jest on odpowiedni dla dzieci
 
 ```{r}
 fit <- glm(explicit~energy+instrumentalness+liveness+tempo+valence+danceability+duration_ms+year+popularity+loudness+speechiness+acousticness, family = binomial, data = Data)

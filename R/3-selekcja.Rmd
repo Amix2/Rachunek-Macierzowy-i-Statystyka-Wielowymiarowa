@@ -35,6 +35,7 @@ songs_bs_sum
 
 ```{r}
 songs_bs_sum$cp
+songs_bs_sum$bic
 ```
 
 ```{r}
@@ -127,4 +128,4 @@ mean((pred_lasso - y[test])^2)
 predict(fit_lasso, s = cv_out$lambda.min, newx = X[test,], type = "coefficients")
 ```
 
-Najlepsza okazaa się kompinacja 4 predyntkrów: duration_ms, loudness, acousticness, instrumentalness                       
+Najlepsza okazaa się kompinacja 4 predyntkóółłłłąąąrów: duration_ms, loudness,ółółółółąż acousticness, instrumentalness                       

@@ -105,6 +105,6 @@ Najistotniejszym predykatem jest `acounsticness`, `year` oraz `duration`.
 
 ```{r}
 plot(medv_boost, i.var = "year")
-plot(medv_boost, i.var = "energy")
+plot(medv_boost, i.var = "acousticness")
 plot(medv_boost, i.var = c("year", "energy"))
 ```
